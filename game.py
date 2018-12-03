@@ -26,16 +26,24 @@ def initialize_game():
 all_sprites = None
 
 while run_game:
+    mouse_up = False
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run_game = False
         if event.type == pg.KEYDOWN:
             state = "GAME"
+        if event.type == pg.MOUSEBUTTONUP:
+            mouse_up = True
 
     if state == "MENU":
-        button_state = menu.is_clicked()
+        menu.is_mouse_over()
+        if mouse_up:
+            button_state = menu.is_clicked(pg.mouse.get_pos())
+        else:
+            button_state = None
         if button_state == "New_Game":
-            state = "Game"
+            state = "GAME"
+            screen.fill((0, 0, 0))
         elif button_state == "Quit":
             pg.event.post(pg.event.Event(pg.QUIT, {}))
     elif state == "GAME":
@@ -44,4 +52,6 @@ while run_game:
 
         all_sprites.draw(screen)
         pass
+
     pg.display.flip()
+    clock.tick()

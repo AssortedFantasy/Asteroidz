@@ -20,8 +20,8 @@ class Menu:
         self.menu = pygame.Surface.convert(pygame.image.load(background_file))
         # Scale it to the correct resolution
         self.menu = pygame.transform.smoothscale(self.menu, screen.get_size())
-        self.add_button(ButtonSprite('Start', 0.5, 0.4, 300, 100, Path("./Assets/").glob("New_game*")))
-        self.add_button(ButtonSprite('Start', 0.5, 0.6, 300, 100, Path("./Assets/").glob("Quit*")))
+        self.add_button(ButtonSprite('New_Game', 0.5, 0.4, 300, 100, Path("./Assets/").glob("New_game*")))
+        self.add_button(ButtonSprite('Quit', 0.5, 0.6, 300, 100, Path("./Assets/").glob("Quit*")))
         self.update()
 
     # Draws the button again
@@ -40,19 +40,18 @@ class Menu:
         self.update()
 
     # Returns the name of a button in the menu if it is clicked
-    def is_clicked(self):
-        for event in pygame.event.get():
-            print(pygame.mouse.get_pos())
-            if event.type == pygame.MOUSEBUTTONUP:
-                for button in self.buttons:
-                    if button.rect.collidepoint(pygame.mouse.get_pos()):
-                        return button.name
+    def is_clicked(self, mouse_pos):
+        for button in self.buttons:
+            if button.rect.collidepoint(mouse_pos):
+                return button.name
 
     def is_mouse_over(self):
         for button in self.buttons:
             if button.rect.collidepoint(pygame.mouse.get_pos()):
-                return button.name
-
+                button.image = button.images[1]
+            else:
+                button.image = button.images[0]
+        self.update()
 class ButtonSprite(pygame.sprite.Sprite):
     def __init__(self, name, rel_x, rel_y, width, height, button_images):
         pygame.sprite.Sprite.__init__(self)
@@ -74,5 +73,4 @@ class ButtonSprite(pygame.sprite.Sprite):
         for image in button_image_files:
             self.images.append(pygame.image.load(image))
         self.image = self.images[self.image_counter]
-        # self.image = pygame.Surface((50, 50))
         self.rect = self.image.get_rect()

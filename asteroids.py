@@ -8,11 +8,13 @@ WIDTH, HEIGHT = 1280, 720
 
 class Game:
     def __init__(self):
+        self.is_running = True
         self.asteroid_sprites = pg.sprite.Group()
         self.missile_sprites = pg.sprite.Group()
         self.player = pg.sprite.GroupSingle()
 
-        self.player.add(Player(WIDTH // 2, HEIGHT // 2))
+        self.player_sprite = Player(WIDTH // 2, HEIGHT // 2)
+        self.player.add(self.player_sprite)
         self.space_pressed = False
 
     def add_random_asteroid(self):
@@ -36,6 +38,10 @@ class Game:
         self.spawn_missiles()
         self.check_collisions()
         self.check_player_collision()
+        if self.player_sprite.health < 0:
+            self.is_running = False
+        if not self.asteroid_sprites: # If there aren't any asteroids
+            self.is_running = False
 
     def check_collisions(self):
         collided_missiles = pg.sprite.groupcollide(self.missile_sprites, self.asteroid_sprites, True, False,
@@ -120,7 +126,7 @@ class Player(pg.sprite.Sprite):
     def __init__(self, xpos, ypos):
         pg.sprite.Sprite.__init__(self)
 
-        self.health = 10
+        self.health = 5
         self.invunticks = 180
 
         self.fixed_image = pg.image.load((assets_folder / "ship.png").as_posix()).convert()

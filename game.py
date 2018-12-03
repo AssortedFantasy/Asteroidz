@@ -37,8 +37,6 @@ while run_game:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run_game = False
-        if event.type == pg.KEYDOWN:
-            state = "GAME"
         if event.type == pg.MOUSEBUTTONUP:
             mouse_up = True
 
@@ -70,6 +68,9 @@ while run_game:
     elif state == "GAME":
         if game is None:
             game = initialize_game()
+
+        if not game.is_running:
+            state = "GAME_OVER"
 
         game.update()
         game.draw(screen)

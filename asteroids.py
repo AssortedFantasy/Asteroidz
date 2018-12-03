@@ -167,8 +167,12 @@ class Asteroid(pg.sprite.Sprite):
 
         self.rect.x = xpos
         self.rect.y = ypos
-        self.vx = xvel
-        self.vy = yvel
+
+        # The Atan is used to smush the velocities down a bit if they are too fast.
+        self.vx = math.atan(xvel/8)*8
+        self.vy = math.atan(yvel/8)*8
+
+
         self.size = size
 
     def split(self):

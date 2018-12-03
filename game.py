@@ -1,4 +1,5 @@
 import pygame as pg
+import asteroids
 
 WIDTH, HEIGHT = RES = (1280, 720)
 fps = 60
@@ -15,18 +16,27 @@ state = "MENU"
 
 
 def initialize_game():
-    pass
+    sprites = pg.sprite.Group()
+    sprites.add(asteroids.Asteroid(3, 100, 100, 20, 20))
+    return sprites
 
+
+all_sprites = None
 
 while run_game:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run_game = False
+        if event.type == pg.KEYDOWN:
+            state = "GAME"
 
     if state == "MENU":
         # Menu Code
         pass
     elif state == "GAME":
-        # Game code
+        if all_sprites is None:
+            all_sprites = initialize_game()
+
+        all_sprites.draw(screen)
         pass
     pg.display.flip()

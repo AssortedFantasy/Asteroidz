@@ -3,10 +3,9 @@ from pathlib import Path
 
 
 class Menu:
-    def __init__(self, game_state, bg_path="./assets/Background.png"):
+    def __init__(self, bg_path="./assets/Background.png"):
         self.buttons = []
-        self.game = game_state
-        self.width, self.height = game_state.main_display.get_size()
+        self.width, self.height = pygame.display.get_size()
         self.menu_sprites = pygame.sprite.Group()
         background_location = Path(bg_path)
         try:
@@ -19,20 +18,20 @@ class Menu:
         # Convert image surface so it can blit faster
         self.menu = pygame.Surface.convert(pygame.image.load(background_file))
         # Scale it to the correct resolution
-        self.menu = pygame.transform.scale(self.menu, self.game.main_display.get_size())
+        self.menu = pygame.transform.scale(self.menu, self.game.display.get_size())
         self.add_button(ButtonSprite())
         self.update()
 
     # Draws the button again
     def update(self):
         for button in self.buttons:
-            gx, gy = self.game.main_display.get_size()
+            gx, gy = self.pygame.display.get_size()
             button.rect.center = (gx * button.rel_x, gy * button.rel_y)
             # DEGUB CODE
             print(button.rect.center)
         self.menu_sprites.update()
         self.menu_sprites.draw(self.menu)
-        self.game.main_display.blit(self.menu, (0, 0))
+        self.pygame.main_display.blit(self.menu, (0, 0))
 
     # Adds a button to the menu and updates the menu
     def add_button(self, button):
@@ -53,19 +52,23 @@ class Menu:
                 return button.name
 
 class ButtonSprite(pygame.sprite.Sprite):
-    def __init__(self, name, rel_x, rel_y, width, height, button_image):
+    def __init__(self, name, rel_x, rel_y, width, height, button_images):
         pygame.sprite.Sprite.__init__(self)
-        self.button_image = button_image
         self.name = name
+        self.image_counter = 0
         self.rel_x = rel_x
         self.rel_y = rel_y
-        button_image_path = Path(button_image)
+        button_image_files = []
         try:
-            button_image_file = open(button_image_path, mode="rb")
+            for image in button_images:
+                image_path = Path(image)
+                button_image_files.append(open(image_path, mode="rb"))
         except FileNotFoundError:
-            button_image_file = None
+            button_image_files[-1] = None
             print("Error: Missing main menu picture! Is the assets folder missing or path incorrect?"
-                  "\nPATH={}".format(button_image_path))
+                  "\nPATH={}".format(button_images[len(button_image_files) - 1]))
             exit(-1)
-        self.image = pygame.image.load(button_image_file).convert()
+        for image in button_image_files:
+            self.images.append(pygame.image.load(image))
+        self.image = self.images[self.image_counter]
         self.rect = self.image.get_rect()

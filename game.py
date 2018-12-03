@@ -1,4 +1,5 @@
 import pygame as pg
+import menus
 
 WIDTH, HEIGHT = RES = (1280, 720)
 fps = 60
@@ -24,7 +25,7 @@ while run_game:
             run_game = False
 
     if state == "MENU":
-        # Menu Code
+        menu = menus.Menu()
         pass
     elif state == "GAME":
         # Game code

@@ -87,4 +87,4 @@ class Text:
         self.rel_y = rel_y
         pygame.font.init()
         self.font = pygame.font.SysFont("impact", size)
-        self.image = self.font.render(self.text, False, (255, 255, 255))
+        self.image = self.font.render(self.text, True, (255, 255, 255))

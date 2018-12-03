@@ -18,8 +18,8 @@ class Game:
         posx = random.randrange(0, WIDTH)
         posy = random.randrange(0, HEIGHT)
 
-        vx = random.randint(3, 14-size)
-        vy = random.randint(3, 14-size)
+        vx = random.randint(size-12, 12-size)
+        vy = random.randint(size-12, 12-size)
 
         self.asteroid_sprites.add(Asteroid(size, posx, posy, vx, vy))
 

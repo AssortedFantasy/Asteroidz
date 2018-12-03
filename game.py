@@ -17,7 +17,7 @@ state = "MENU"
 
 def initialize_game():
     sprites = pg.sprite.Group()
-    sprites.add(asteroids.Asteroid(3, 100, 100, 20, 20))
+    sprites.add(asteroids.Asteroid(3, 100, 100, 10, 10))
     return sprites
 
 
@@ -30,6 +30,8 @@ while run_game:
         if event.type == pg.KEYDOWN:
             state = "GAME"
 
+    screen.fill((0, 0, 0))
+
     if state == "MENU":
         # Menu Code
         pass
@@ -37,6 +39,7 @@ while run_game:
         if all_sprites is None:
             all_sprites = initialize_game()
 
+        all_sprites.update()
         all_sprites.draw(screen)
-        pass
     pg.display.flip()
+    clock.tick(fps)

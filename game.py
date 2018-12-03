@@ -12,12 +12,12 @@ clock = pg.time.Clock()
 
 
 run_game = True
+menu = menus.Menu(screen)
 state = "MENU"
 
 
 def initialize_game():
     pass
-
 
 while run_game:
     for event in pg.event.get():
@@ -25,7 +25,7 @@ while run_game:
             run_game = False
 
     if state == "MENU":
-        menu = menus.Menu()
+
         pass
     elif state == "GAME":
         # Game code

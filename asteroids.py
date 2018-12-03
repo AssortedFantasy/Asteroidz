@@ -9,6 +9,7 @@ WIDTH, HEIGHT = 1280, 720
 class Game:
     def __init__(self):
         self.is_running = True
+        self.won = False
         self.asteroid_sprites = pg.sprite.Group()
         self.missile_sprites = pg.sprite.Group()
         self.player = pg.sprite.GroupSingle()
@@ -18,14 +19,14 @@ class Game:
         self.space_pressed = False
 
     def add_random_asteroid(self):
-        size = random.choices([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-                              [1, 2, 4, 8, 8, 8, 5, 3, 2, 1, 1])[0]
+        size = random.choices([5, 6, 7, 8, 9, 10, 11],
+                              [8, 8, 5, 3, 2, 1, 1])[0]
 
         posx = random.randrange(0, WIDTH)
         posy = random.randrange(0, HEIGHT)
 
-        vx = random.randint(size - 12, 12 - size)
-        vy = random.randint(size - 12, 12 - size)
+        vx = random.randint(size - 13, 13 - size)
+        vy = random.randint(size - 13, 13 - size)
 
         angular_velocty = random.random() * 2 - 1
 
@@ -41,6 +42,7 @@ class Game:
         if self.player_sprite.health < 0:
             self.is_running = False
         if not self.asteroid_sprites: # If there aren't any asteroids
+            self.won = True
             self.is_running = False
 
     def check_collisions(self):
@@ -127,7 +129,7 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
 
         self.health = 5
-        self.invunticks = 180
+        self.invunticks = 300
 
         self.fixed_image = pg.image.load((assets_folder / "ship.png").as_posix()).convert()
         self.fixed_image.set_colorkey((0, 0, 0))
@@ -221,7 +223,7 @@ class Asteroid(pg.sprite.Sprite):
 
     def split(self):
         shards = []
-        if self.size <= 1:
+        if self.size <= 2:
             return shards
         else:
             split_into = random.choices([1, 2, 3], [2, 10, 2])[0]

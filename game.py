@@ -21,16 +21,18 @@ score_screen.textBoxes.append(menus.Text("231", 0.48, 0.27, 65))
 score_screen.add_button(menus.ButtonSprite('Back', 0.5, 0.5, 250, 80, Path("./Assets/").glob("Back*")))
 
 
-# state = "MENU"
-state = "GAME_OVER"
+state = "MENU"
 run_game = True
 
-def initialize_game():
+level = 1
+
+
+def initialize_game(i):
     new_game = asteroids.Game()
-    new_game.add_random_asteroid()
-    new_game.add_random_asteroid()
-    new_game.add_random_asteroid()
+    for _ in range(i):
+        new_game.add_random_asteroid()
     return new_game
+
 
 while run_game:
     mouse_up = False
@@ -67,13 +69,19 @@ while run_game:
             pass
     elif state == "GAME":
         if game is None:
-            game = initialize_game()
-
-        if not game.is_running:
-            state = "GAME_OVER"
+            game = initialize_game(1)
 
         game.update()
         game.draw(screen)
+
+        if not game.is_running:
+            if game.won:
+                level += 1
+                game = initialize_game(level)
+            else:
+                state = "GAME_OVER"
+                level = 1
+                game = None
 
     pg.display.flip()
     clock.tick(fps)

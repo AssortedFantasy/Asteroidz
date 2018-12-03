@@ -11,6 +11,8 @@ class Game:
         self.missile_sprites = pg.sprite.Group()
         self.player = pg.sprite.GroupSingle()
 
+        self.player.add(Player(WIDTH//2, HEIGHT//2))
+
     def add_random_asteroid(self):
         size = random.choices([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
                               [1, 2, 4, 8, 8, 8, 5, 3, 2, 1, 1])[0]
@@ -59,8 +61,44 @@ class Missile(pg.sprite.Sprite):
         self.rect.y += self.vy
         if self.rect.left > WIDTH:
             self.rect.right = 0
+        if self.rect.right < 0:
+            self.rect.left = WIDTH
         if self.rect.top > HEIGHT:
             self.rect.bottom = 0
+        if self.rect.bottom < 0:
+            self.rect.top = HEIGHT
+
+
+class Player(pg.sprite.Sprite):
+    def __init__(self, xpos, ypos):
+        pg.sprite.Sprite.__init__(self)
+        self.image = pg.image.load((assets_folder / "ship.png").as_posix()).convert()
+        self.image.set_colorkey((0, 0, 0))
+        self.rect = self.image.get_rect()
+        self.vx = 0
+        self.vy = 0
+
+    def update(self):
+        self.rect.x += self.vx
+        self.rect.y += self.vy
+        if self.rect.left > WIDTH:
+            self.rect.right = 0
+        if self.rect.right < 0:
+            self.rect.left = WIDTH
+        if self.rect.top > HEIGHT:
+            self.rect.bottom = 0
+        if self.rect.bottom < 0:
+            self.rect.top = HEIGHT
+
+        keys = pg.key.get_pressed()
+        if keys[pg.K_w]:
+            self.vy -= 1
+        if keys[pg.K_s]:
+            self.vy += 1
+        if keys[pg.K_a]:
+            self.vx -= 1
+        if keys[pg.K_d]:
+            self.vx += 1
 
 
 class Asteroid(pg.sprite.Sprite):
@@ -82,11 +120,11 @@ class Asteroid(pg.sprite.Sprite):
         if self.size <= 1:
             return shards
         else:
-            split_into = random.choices([1, 2, 3, 4], [5, 10, 2, 1])
+            split_into = random.choices([1, 2, 3, 4], [5, 10, 2, 1])[0]
             for i in range(split_into):
                 shards.append(
                     Asteroid(self.size-1, self.rect.x, self.rect.y,
-                             self.vx + random.randint(0, 2), self.vy + random.randint(0, 2))
+                             self.vx + random.randint(-3, 3), self.vy + random.randint(-3, 3))
                 )
             return shards
 
@@ -95,6 +133,10 @@ class Asteroid(pg.sprite.Sprite):
         self.rect.y += self.vy
         if self.rect.left > WIDTH:
             self.rect.right = 0
+        if self.rect.right < 0:
+            self.rect.left = WIDTH
         if self.rect.top > HEIGHT:
             self.rect.bottom = 0
+        if self.rect.bottom < 0:
+            self.rect.top = HEIGHT
 

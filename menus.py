@@ -1,7 +1,6 @@
 import pygame
 from pathlib import Path
 
-
 class Menu:
     def __init__(self, screen, bg_path="./assets/Background.png"):
         self.buttons = []

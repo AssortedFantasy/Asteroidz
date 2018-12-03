@@ -1,6 +1,7 @@
 import pygame as pg
 from pathlib import Path
 import random
+import math
 
 WIDTH, HEIGHT = 1280, 720
 
@@ -12,6 +13,7 @@ class Game:
         self.player = pg.sprite.GroupSingle()
 
         self.player.add(Player(WIDTH//2, HEIGHT//2))
+        self.space_pressed = False
 
     def add_random_asteroid(self):
         size = random.choices([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
@@ -30,6 +32,20 @@ class Game:
         self.missile_sprites.update()
         self.player.update()
 
+        keys = pg.key.get_pressed()
+        if not keys[pg.K_SPACE]:
+            if self.space_pressed:
+                self.space_pressed = False
+                player = self.player.sprites()[0]
+
+                posx, posy = player.rect.center
+                angle = player.angle
+                new_missle = Missile(posx - 12*math.sin(angle), posy - 12*math.cos(angle), angle,
+                                     4 + math.sqrt(player.vx**2 + player.vy**2))
+                self.missile_sprites.add(new_missle)
+        else:
+            self.space_pressed = True
+
     def draw(self, screen):
         self.asteroid_sprites.draw(screen)
         self.missile_sprites.draw(screen)
@@ -46,41 +62,55 @@ for image in (assets_folder / "asteroids").glob("*.png"):
 
 
 class Missile(pg.sprite.Sprite):
-    def __init__(self, xpos, ypos, xvel, yvel):
+    def __init__(self, xpos, ypos, angle, velocity):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.image.load((assets_folder / "missile.png").as_posix()).covert()
+        fixed_missile_image = pg.image.load((assets_folder / "missile.png").as_posix()).convert()
+        self.image = pg.transform.rotate(fixed_missile_image, math.degrees(angle))
         self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.x = xpos
         self.rect.y = ypos
-        self.vx = xvel
-        self.vy = yvel
+        self.vx = -math.sin(angle)*velocity
+        self.vy = -math.cos(angle)*velocity
 
     def update(self):
         self.rect.x += self.vx
         self.rect.y += self.vy
-        if self.rect.left > WIDTH:
-            self.rect.right = 0
-        if self.rect.right < 0:
-            self.rect.left = WIDTH
-        if self.rect.top > HEIGHT:
-            self.rect.bottom = 0
-        if self.rect.bottom < 0:
-            self.rect.top = HEIGHT
+        if self.rect.left > WIDTH or self.rect.right < 0 or self.rect.top > HEIGHT or self.rect.bottom < 0:
+            self.kill()
 
 
 class Player(pg.sprite.Sprite):
     def __init__(self, xpos, ypos):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.image.load((assets_folder / "ship.png").as_posix()).convert()
-        self.image.set_colorkey((0, 0, 0))
+        self.fixed_image = pg.image.load((assets_folder / "ship.png").as_posix()).convert()
+        self.fixed_image.set_colorkey((0, 0, 0))
+
+        self.image = pg.transform.rotate(self.fixed_image, 0)
         self.rect = self.image.get_rect()
+
+        self.rect.x = xpos
+        self.rect.y = ypos
+        self.angle = 0
         self.vx = 0
         self.vy = 0
 
+    def fix_angles(self):
+        old_rect = self.rect
+        self.image = pg.transform.rotate(self.fixed_image, math.degrees(self.angle))
+        self.image.set_colorkey((0, 0, 0))
+        self.rect = self.image.get_rect()
+        self.rect.center = old_rect.center
+
     def update(self):
+        self.fix_angles()
         self.rect.x += self.vx
         self.rect.y += self.vy
+
+        # Slow reduction in acceleration over time.
+        self.vx *= 0.97
+        self.vy *= 0.97
+
         if self.rect.left > WIDTH:
             self.rect.right = 0
         if self.rect.right < 0:
@@ -91,14 +121,16 @@ class Player(pg.sprite.Sprite):
             self.rect.top = HEIGHT
 
         keys = pg.key.get_pressed()
-        if keys[pg.K_w]:
-            self.vy -= 1
-        if keys[pg.K_s]:
-            self.vy += 1
+        if keys[pg.K_w]:  # Accelerate
+            self.vx -= math.sin(self.angle)*0.3
+            self.vy -= math.cos(self.angle)*0.3
+        if keys[pg.K_s]:  # Decelerate
+            self.vx += math.sin(self.angle) * 0.3
+            self.vy += math.cos(self.angle) * 0.3
         if keys[pg.K_a]:
-            self.vx -= 1
+            self.angle += 0.1
         if keys[pg.K_d]:
-            self.vx += 1
+            self.angle -= 0.1
 
 
 class Asteroid(pg.sprite.Sprite):

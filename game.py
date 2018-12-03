@@ -25,7 +25,7 @@ def initialize_game():
 
 while run_game:
     menu = menus.Menu(screen)
-    mouse_up = Falsejjjjjjjj
+    mouse_up = False
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run_game = False

@@ -12,7 +12,7 @@ class Game:
         self.missile_sprites = pg.sprite.Group()
         self.player = pg.sprite.GroupSingle()
 
-        self.player.add(Player(WIDTH//2, HEIGHT//2))
+        self.player.add(Player(WIDTH // 2, HEIGHT // 2))
         self.space_pressed = False
 
     def add_random_asteroid(self):
@@ -22,10 +22,12 @@ class Game:
         posx = random.randrange(0, WIDTH)
         posy = random.randrange(0, HEIGHT)
 
-        vx = random.randint(size-12, 12-size)
-        vy = random.randint(size-12, 12-size)
+        vx = random.randint(size - 12, 12 - size)
+        vy = random.randint(size - 12, 12 - size)
 
-        self.asteroid_sprites.add(Asteroid(size, posx, posy, vx, vy))
+        angular_velocty = random.random() * 2 - 1
+
+        self.asteroid_sprites.add(Asteroid(size, posx, posy, vx, vy, angular_velocty))
 
     def update(self):
         self.asteroid_sprites.update()
@@ -33,6 +35,7 @@ class Game:
         self.player.update()
         self.spawn_missiles()
         self.check_collisions()
+        self.check_player_collision()
 
     def check_collisions(self):
         collided_missiles = pg.sprite.groupcollide(self.missile_sprites, self.asteroid_sprites, True, False,
@@ -43,6 +46,25 @@ class Game:
                 if astroid.get_hit():
                     self.asteroid_sprites.add(astroid.split())
 
+    def check_player_collision(self):
+        player = self.player.sprites()[0]
+
+        if player.invunticks > 0:
+            return
+
+        collided_asteroids = pg.sprite.groupcollide(self.player, self.asteroid_sprites, False, False,
+                                                    collided=pg.sprite.collide_circle)
+
+        for key, value in collided_asteroids.items():
+            player = key
+            asteroids = value
+            for asteroid in asteroids:
+                while not asteroid.get_hit():
+                    pass
+                self.asteroid_sprites.add(asteroid.split())
+
+            player.health -= 1
+            player.invunticks = 180
 
     def spawn_missiles(self):
         keys = pg.key.get_pressed()
@@ -53,7 +75,7 @@ class Game:
 
                 posx, posy = player.rect.center
                 angle = player.angle
-                new_missle = Missile(posx - 12*math.sin(angle), posy - 12*math.cos(angle), angle, 4,
+                new_missle = Missile(posx - 12 * math.sin(angle), posy - 12 * math.cos(angle), angle, 4,
                                      player.vx, player.vy)
                 self.missile_sprites.add(new_missle)
         else:
@@ -84,8 +106,8 @@ class Missile(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = xpos
         self.rect.y = ypos
-        self.vx = -math.sin(angle)*velocity + vx_i
-        self.vy = -math.cos(angle)*velocity + vy_i
+        self.vx = -math.sin(angle) * velocity + vx_i
+        self.vy = -math.cos(angle) * velocity + vy_i
 
     def update(self):
         self.rect.x += self.vx
@@ -97,9 +119,13 @@ class Missile(pg.sprite.Sprite):
 class Player(pg.sprite.Sprite):
     def __init__(self, xpos, ypos):
         pg.sprite.Sprite.__init__(self)
+
+        self.health = 10
+        self.invunticks = 180
+
         self.fixed_image = pg.image.load((assets_folder / "ship.png").as_posix()).convert()
         self.fixed_image.set_colorkey((0, 0, 0))
-        self.radius = 6
+        self.radius = 10
 
         self.image = pg.transform.rotate(self.fixed_image, 0)
         self.rect = self.image.get_rect()
@@ -117,8 +143,17 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = old_rect.center
 
+    def make_blank(self):
+        self.image.fill((0,0,0))
+
     def update(self):
+        self.invunticks -= 1
         self.fix_angles()
+
+        if self.invunticks > 0:
+            if self.invunticks & 16:
+                self.make_blank()
+
         self.rect.x += self.vx
         self.rect.y += self.vy
 
@@ -137,8 +172,8 @@ class Player(pg.sprite.Sprite):
 
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:  # Accelerate
-            self.vx -= math.sin(self.angle)*0.3
-            self.vy -= math.cos(self.angle)*0.3
+            self.vx -= math.sin(self.angle) * 0.3
+            self.vy -= math.cos(self.angle) * 0.3
         if keys[pg.K_s]:  # Decelerate
             self.vx += math.sin(self.angle) * 0.3
             self.vy += math.cos(self.angle) * 0.3
@@ -149,14 +184,16 @@ class Player(pg.sprite.Sprite):
 
 
 class Asteroid(pg.sprite.Sprite):
-    def __init__(self, size, xpos, ypos, xvel, yvel):
+    def __init__(self, size, xpos, ypos, xvel, yvel, rotation):
         pg.sprite.Sprite.__init__(self)
         # Size is essentially the width, times 10px
-        self.image = pg.transform.smoothscale(
-                    pg.image.load(random.choice(asteroid_art)).convert(), (30 * size, 30*size))
-        self.image.set_colorkey((0, 0, 0))
+        self.fixed_image = pg.transform.smoothscale(
+            pg.image.load(random.choice(asteroid_art)).convert(), (30 * size, 30 * size))
+        self.fixed_image.set_colorkey((0, 0, 0))
+
+        self.image = pg.transform.rotate(self.fixed_image, 0)
         self.rect = self.image.get_rect()
-        self.radius = 15*size
+        self.radius = 15 * size
 
         if size < 4:
             self.health = 1
@@ -165,13 +202,14 @@ class Asteroid(pg.sprite.Sprite):
         else:
             self.health = 3
 
+        self.angv = math.atan(rotation / 5) * 5
+        self.angle = 0
         self.rect.x = xpos
         self.rect.y = ypos
 
         # The Atan is used to smush the velocities down a bit if they are too fast.
-        self.vx = math.atan(xvel/8)*8
-        self.vy = math.atan(yvel/8)*8
-
+        self.vx = math.atan(xvel / 8) * 8
+        self.vy = math.atan(yvel / 8) * 8
 
         self.size = size
 
@@ -183,8 +221,9 @@ class Asteroid(pg.sprite.Sprite):
             split_into = random.choices([1, 2, 3], [2, 10, 2])[0]
             for i in range(split_into):
                 shards.append(
-                    Asteroid(int(self.size/1.3), self.rect.x, self.rect.y,
-                             self.vx + random.randint(-3, 3), self.vy + random.randint(-3, 3))
+                    Asteroid(int(self.size / 1.3), self.rect.x, self.rect.y,
+                             self.vx + random.randint(-3, 3), self.vy + random.randint(-3, 3),
+                             self.angv + random.randint(-3, 3))
                 )
             return shards
 
@@ -196,7 +235,16 @@ class Asteroid(pg.sprite.Sprite):
         else:
             return False
 
+    def rotate_image(self):
+        old_rect = self.rect
+        self.image = pg.transform.rotate(self.fixed_image, math.degrees(self.angle))
+        self.rect = self.image.get_rect()
+        self.rect.center = old_rect.center
+
     def update(self):
+        self.angle += 0.02 * self.angv
+        self.rotate_image()
+
         self.rect.x += self.vx
         self.rect.y += self.vy
         if self.rect.left > WIDTH:
@@ -207,4 +255,3 @@ class Asteroid(pg.sprite.Sprite):
             self.rect.bottom = 0
         if self.rect.bottom < 0:
             self.rect.top = HEIGHT
-

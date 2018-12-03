@@ -9,19 +9,18 @@ speed = 0.1
 pg.init()
 screen = pg.display.set_mode(RES)
 clock = pg.time.Clock()
-
+game = None
 
 run_game = True
 state = "MENU"
 
 
 def initialize_game():
-    sprites = pg.sprite.Group()
-    sprites.add(asteroids.Asteroid(3, 100, 100, 10, 10))
-    return sprites
-
-
-all_sprites = None
+    new_game = asteroids.Game()
+    new_game.add_random_asteroid()
+    new_game.add_random_asteroid()
+    new_game.add_random_asteroid()
+    return new_game
 
 while run_game:
     for event in pg.event.get():
@@ -36,10 +35,11 @@ while run_game:
         # Menu Code
         pass
     elif state == "GAME":
-        if all_sprites is None:
-            all_sprites = initialize_game()
+        if game is None:
+            game = initialize_game()
 
-        all_sprites.update()
-        all_sprites.draw(screen)
+        game.update()
+        game.draw(screen)
+
     pg.display.flip()
     clock.tick(fps)

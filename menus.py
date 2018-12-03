@@ -3,9 +3,10 @@ from pathlib import Path
 
 
 class Menu:
-    def __init__(self, bg_path="./assets/Background.png"):
+    def __init__(self, screen, bg_path="./assets/Background.png"):
         self.buttons = []
-        self.width, self.height = pygame.display.get_size()
+        self.screen = screen
+        self.width, self.height = screen.get_size()
         self.menu_sprites = pygame.sprite.Group()
         background_location = Path(bg_path)
         try:
@@ -18,24 +19,26 @@ class Menu:
         # Convert image surface so it can blit faster
         self.menu = pygame.Surface.convert(pygame.image.load(background_file))
         # Scale it to the correct resolution
-        self.menu = pygame.transform.scale(self.menu, self.game.display.get_size())
-        self.add_button(ButtonSprite())
+        self.menu = pygame.transform.scale(self.menu, screen.get_size())
+        self.add_button(ButtonSprite('Start', 0.5, 0.5, 300, 100, Path("./Assets/").glob("*.png")))
         self.update()
 
     # Draws the button again
     def update(self):
         for button in self.buttons:
-            gx, gy = self.pygame.display.get_size()
+            gx, gy = self.screen.get_size()
             button.rect.center = (gx * button.rel_x, gy * button.rel_y)
             # DEGUB CODE
             print(button.rect.center)
+            print(self.screen.get_rect().center)
         self.menu_sprites.update()
         self.menu_sprites.draw(self.menu)
-        self.pygame.main_display.blit(self.menu, (0, 0))
+        self.screen.blit(self.menu, (0, 0))
 
     # Adds a button to the menu and updates the menu
     def add_button(self, button):
         self.buttons.append(button)
+        self.menu_sprites.add(button)
         self.update()
 
     # Returns the name of a button in the menu if it is clicked
@@ -55,6 +58,7 @@ class ButtonSprite(pygame.sprite.Sprite):
     def __init__(self, name, rel_x, rel_y, width, height, button_images):
         pygame.sprite.Sprite.__init__(self)
         self.name = name
+        self.images = []
         self.image_counter = 0
         self.rel_x = rel_x
         self.rel_y = rel_y
@@ -71,4 +75,6 @@ class ButtonSprite(pygame.sprite.Sprite):
         for image in button_image_files:
             self.images.append(pygame.image.load(image))
         self.image = self.images[self.image_counter]
+        # self.image = pygame.Surface((50, 50))
+        self.image.fill((0, 0, 255))
         self.rect = self.image.get_rect()

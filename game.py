@@ -13,6 +13,7 @@ clock = pg.time.Clock()
 game = None
 
 run_game = True
+menu = menus.Menu(screen)
 state = "MENU"
 
 
@@ -24,7 +25,6 @@ def initialize_game():
     return new_game
 
 while run_game:
-    menu = menus.Menu(screen)
     mouse_up = False
     for event in pg.event.get():
         if event.type == pg.QUIT:

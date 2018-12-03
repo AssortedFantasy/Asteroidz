@@ -4,6 +4,7 @@ from pathlib import Path
 class Menu:
     def __init__(self, screen, bg_path="./assets/Background.png"):
         self.buttons = []
+        self.textBoxes = []
         self.screen = screen
         self.width, self.height = screen.get_size()
         self.menu_sprites = pygame.sprite.Group()
@@ -19,8 +20,6 @@ class Menu:
         self.menu = pygame.Surface.convert(pygame.image.load(background_file))
         # Scale it to the correct resolution
         self.menu = pygame.transform.smoothscale(self.menu, screen.get_size())
-        self.add_button(ButtonSprite('New_Game', 0.5, 0.4, 300, 100, Path("./Assets/").glob("New_game*")))
-        self.add_button(ButtonSprite('Quit', 0.5, 0.6, 300, 100, Path("./Assets/").glob("Quit*")))
         self.update()
 
     # Draws the button again
@@ -28,6 +27,9 @@ class Menu:
         for button in self.buttons:
             gx, gy = self.screen.get_size()
             button.rect.center = (gx * button.rel_x, gy * button.rel_y)
+        for textBox in self.textBoxes:
+            gx, gy = self.screen.get_size()
+            self.menu.blit(textBox.image, (gx * textBox.rel_x, gy * textBox.rel_y))
         self.menu_sprites.update()
         self.menu_sprites.draw(self.menu)
         self.screen.blit(self.menu, (0, 0))
@@ -51,8 +53,10 @@ class Menu:
             else:
                 button.image = button.images[0]
         self.update()
+
+
 class ButtonSprite(pygame.sprite.Sprite):
-    def __init__(self, name, rel_x, rel_y, width, height, button_images):
+    def __init__(self, name, rel_x, rel_y, width, height, button_images, text=""):
         pygame.sprite.Sprite.__init__(self)
         self.name = name
         self.images = []
@@ -70,6 +74,17 @@ class ButtonSprite(pygame.sprite.Sprite):
                   "\nPATH={}".format(button_images[len(button_image_files) - 1]))
             exit(-1)
         for image in button_image_files:
-            self.images.append(pygame.image.load(image))
+            self.images.append(pygame.transform.smoothscale(pygame.image.load(image), (width, height)))
         self.image = self.images[self.image_counter]
         self.rect = self.image.get_rect()
+
+
+class Text:
+
+    def __init__(self, text, rel_x, rel_y, size):
+        self.text = " " + text + " "
+        self.rel_x = rel_x
+        self.rel_y = rel_y
+        pygame.font.init()
+        self.font = pygame.font.SysFont("impact", size)
+        self.image = self.font.render(self.text, False, (255, 255, 255))

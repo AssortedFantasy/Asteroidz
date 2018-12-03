@@ -1,4 +1,5 @@
 import pygame as pg
+from pathlib import Path
 import asteroids
 import menus
 
@@ -12,10 +13,17 @@ screen = pg.display.set_mode(RES)
 clock = pg.time.Clock()
 game = None
 
-run_game = True
 menu = menus.Menu(screen)
-state = "MENU"
+menu.add_button(menus.ButtonSprite('New_Game', 0.5, 0.4, 600, 100, Path("./Assets/").glob("New_game*")))
+menu.add_button(menus.ButtonSprite('Quit', 0.5, 0.6, 300, 90, Path("./Assets/").glob("Quit*")))
+score_screen = menus.Menu(screen, bg_path="./assets/Score_screen.png")
+score_screen.textBoxes.append(menus.Text("SCORE", 0.5, 0.25, 80))
+score_screen.add_button(menus.ButtonSprite('Back', 0.5, 0.5, 250, 80, Path("./Assets/").glob("Back*")))
 
+
+# state = "MENU"
+state = "GAME_OVER"
+run_game = True
 
 def initialize_game():
     new_game = asteroids.Game()
@@ -48,6 +56,17 @@ while run_game:
         elif button_state == "Quit":
             pg.event.post(pg.event.Event(pg.QUIT, {}))
         pass
+    elif state == "GAME_OVER":
+        score_screen.is_mouse_over()
+        if mouse_up:
+            button_state = score_screen.is_clicked(pg.mouse.get_pos())
+            print(button_state)
+        else:
+            button_state = None
+        if button_state == "Back":
+            state = "MENU"
+            menu.update()
+            pass
     elif state == "GAME":
         if game is None:
             game = initialize_game()

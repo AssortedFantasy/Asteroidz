@@ -83,7 +83,7 @@ class Game:
 
                 posx, posy = player.rect.center
                 angle = player.angle
-                new_missle = Missile(posx - 12 * math.sin(angle), posy - 12 * math.cos(angle), angle, 4,
+                new_missle = Missile(posx - 12 * math.sin(angle), posy - 12 * math.cos(angle), angle, 7,
                                      player.vx, player.vy)
                 self.missile_sprites.add(new_missle)
         else:

@@ -19,8 +19,9 @@ class Menu:
         # Convert image surface so it can blit faster
         self.menu = pygame.Surface.convert(pygame.image.load(background_file))
         # Scale it to the correct resolution
-        self.menu = pygame.transform.scale(self.menu, screen.get_size())
-        self.add_button(ButtonSprite('Start', 0.5, 0.5, 300, 100, Path("./Assets/").glob("*.png")))
+        self.menu = pygame.transform.smoothscale(self.menu, screen.get_size())
+        self.add_button(ButtonSprite('Start', 0.5, 0.4, 300, 100, Path("./Assets/").glob("New_game*")))
+        self.add_button(ButtonSprite('Start', 0.5, 0.6, 300, 100, Path("./Assets/").glob("Quit*")))
         self.update()
 
     # Draws the button again
@@ -28,9 +29,6 @@ class Menu:
         for button in self.buttons:
             gx, gy = self.screen.get_size()
             button.rect.center = (gx * button.rel_x, gy * button.rel_y)
-            # DEGUB CODE
-            print(button.rect.center)
-            print(self.screen.get_rect().center)
         self.menu_sprites.update()
         self.menu_sprites.draw(self.menu)
         self.screen.blit(self.menu, (0, 0))
@@ -43,7 +41,8 @@ class Menu:
 
     # Returns the name of a button in the menu if it is clicked
     def is_clicked(self):
-        for event in self.game.event_queue:
+        for event in pygame.event.get():
+            print(pygame.mouse.get_pos())
             if event.type == pygame.MOUSEBUTTONUP:
                 for button in self.buttons:
                     if button.rect.collidepoint(pygame.mouse.get_pos()):
@@ -76,5 +75,4 @@ class ButtonSprite(pygame.sprite.Sprite):
             self.images.append(pygame.image.load(image))
         self.image = self.images[self.image_counter]
         # self.image = pygame.Surface((50, 50))
-        self.image.fill((0, 0, 255))
         self.rect = self.image.get_rect()

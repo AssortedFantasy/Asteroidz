@@ -1,5 +1,6 @@
 import pygame as pg
 import asteroids
+import menus
 
 WIDTH, HEIGHT = RES = (1280, 720)
 fps = 60
@@ -12,6 +13,7 @@ clock = pg.time.Clock()
 
 
 run_game = True
+menu = menus.Menu(screen)
 state = "MENU"
 
 
@@ -31,8 +33,11 @@ while run_game:
             state = "GAME"
 
     if state == "MENU":
-        # Menu Code
-        pass
+        button_state = menu.is_clicked()
+        if button_state == "New_Game":
+            state = "Game"
+        elif button_state == "Quit":
+            pg.event.post(pg.event.Event(pg.QUIT, {}))
     elif state == "GAME":
         if all_sprites is None:
             all_sprites = initialize_game()

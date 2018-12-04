@@ -6,7 +6,6 @@ import algorithms
 
 WIDTH, HEIGHT = 1280, 720
 
-
 class Game:
     def __init__(self):
         self.is_running = True
@@ -24,6 +23,11 @@ class Game:
         self.player.add(self.player_sprite)
         self.health_bar = HealthBar(self.player_sprite.health, (30, 30))
         self.space_pressed = False
+
+        self.level_cleared = pg.image.load((assets_folder / "level_cleared.png").as_posix()).convert()
+        self.level_cleared.set_colorkey((0, 0, 0))
+        self.level_cleared.get_rect().center = WIDTH//2, HEIGHT//2
+        self.level_cleared_anchor = self.level_cleared.get_rect().topleft
 
     def add_random_asteroid(self):
         size = random.choices([5, 6, 7, 8, 9, 10, 11],
@@ -162,6 +166,8 @@ class Game:
         screen.blit(self.health_bar.health_bar, (0, 0))
         for line in self.line_sprites:
             pg.draw.aaline(screen, (255, 0, 0), line.p0, line.p1, line.life//10)
+        if not self.asteroid_sprites:
+            screen.blit(self.level_cleared, self.level_cleared_anchor)
 
 
 # Where the assets should come from

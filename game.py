@@ -19,7 +19,8 @@ menu.add_button(menus.ButtonSprite('Quit', 0.5, 0.6, 300, 90, Path("./Assets/").
 score_screen = menus.Menu(screen, bg_path="./assets/Score_screen.png")
 score_screen.textBoxes.append(menus.Text("0", 0.48, 0.27, 65))
 score_screen.add_button(menus.ButtonSprite('Back', 0.5, 0.5, 250, 80, Path("./Assets/").glob("Back*")))
-
+score_display = menus.Text("", 0, 0.2, 20)
+asteroids_display = menus.Text("", 0, 0.3, 20)
 
 state = "MENU"
 score = 0
@@ -73,9 +74,13 @@ while run_game:
             game = initialize_game(1)
 
         game.health_bar.update_health(game.player_sprite.health)
+        score_display.update_text("Score:  {}".format(score + game.score))
+        asteroids_display.update_text("Asteroids:  {}".format(len(game.asteroid_sprites.sprites())))
         game.update()
         game.draw(screen)
         screen.blit(game.health_bar.health_bar, (0, 0))
+        screen.blit(score_display.image, (0, 30))
+        screen.blit(asteroids_display.image, (0, 55))
 
         if not game.is_running:
             if game.won:

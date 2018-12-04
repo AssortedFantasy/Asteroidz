@@ -23,7 +23,7 @@ class Menu:
         self.menu = pygame.transform.smoothscale(self.menu, screen.get_size())
         self.update()
 
-    # Draws the button again
+    # Redraws the buttons and text boxes
     def update(self):
         for button in self.buttons:
             gx, gy = self.screen.get_size()
@@ -47,21 +47,28 @@ class Menu:
             if button.rect.collidepoint(mouse_pos):
                 return button.name
 
+    # Test if the mouse is over a button, and update the button accordingly
     def is_mouse_over(self):
         for button in self.buttons:
             if button.rect.collidepoint(pygame.mouse.get_pos()):
+                # Active button image is used
                 button.image = button.images[1]
             else:
+                # Passive button image is used
                 button.image = button.images[0]
         self.update()
 
 
+# Button class that is sprite based
+# Defines a button with relative coordinates
 class ButtonSprite(pygame.sprite.Sprite):
     def __init__(self, name, rel_x, rel_y, width, height, button_images, text=""):
         pygame.sprite.Sprite.__init__(self)
+        # Name of the button, intended to be used to identify which button is pressed
         self.name = name
+        # Image array, stores all potential appearances of the button
         self.images = []
-        self.image_counter = 0
+        # A value from 0 to 1, determines the x coordinate relative to the screen
         self.rel_x = rel_x
         self.rel_y = rel_y
         button_image_files = []

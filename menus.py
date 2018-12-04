@@ -1,6 +1,7 @@
 import pygame
 from pathlib import Path
 
+
 class Menu:
     def __init__(self, screen, bg_path="./assets/Background.png"):
         self.buttons = []
@@ -81,10 +82,14 @@ class ButtonSprite(pygame.sprite.Sprite):
 
 class Text:
 
-    def __init__(self, text, rel_x, rel_y, size):
+    def __init__(self, text, rel_x, rel_y, size, text_colour=(255, 255, 255), bg_colour=(0, 0, 0)):
         self.text = " " + text + " "
         self.rel_x = rel_x
         self.rel_y = rel_y
         pygame.font.init()
         self.font = pygame.font.SysFont("impact", size)
-        self.image = self.font.render(self.text, True, (255, 255, 255))
+        self.image = self.font.render(self.text, True, text_colour, bg_colour)
+
+    def update_text(self, text, text_colour=(255, 255, 255), bg_colour=(0, 0, 0)):
+        self.text = " " + text + " "
+        self.image = self.font.render(self.text, True, text_colour, bg_colour)

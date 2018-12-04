@@ -13,6 +13,7 @@ class Game:
         self.score = 0
         self.asteroid_sprites = pg.sprite.Group()
         self.missile_sprites = pg.sprite.Group()
+        self.power_up_sprites = pg.sprite.Group()
         self.player = pg.sprite.GroupSingle()
 
         self.player_sprite = Player(WIDTH // 2, HEIGHT // 2)
@@ -34,6 +35,9 @@ class Game:
 
         self.asteroid_sprites.add(Asteroid(size, posx, posy, vx, vy, angular_velocity))
 
+        # TEMP TEST CODE
+        self.power_up_sprites.add(HealthUp())
+
     def update(self):
         self.asteroid_sprites.update()
         self.missile_sprites.update()
@@ -41,6 +45,7 @@ class Game:
         self.spawn_missiles()
         self.check_collisions()
         self.check_player_collision()
+        self.check_power_up_collisions()
         if self.player_sprite.health < 0:
             self.is_running = False
         if not self.asteroid_sprites: # If there aren't any asteroids
@@ -76,6 +81,15 @@ class Game:
 
             player.health -= 1
             player.invunticks = 180
+
+    def check_power_up_collisions(self):
+        collided_powerups = pg.sprite.groupcollide(self.power_up_sprites, self.player, True, False,
+                                                   collided=pg.sprite.collide_circle)
+
+        for value in collided_powerups.values():
+            for power_up in value:
+                if power_up.effect == "HealthUp":
+                    self.player_sprite.health += 1
 
     def spawn_missiles(self):
         keys = pg.key.get_pressed()
@@ -267,6 +281,34 @@ class Asteroid(pg.sprite.Sprite):
             self.rect.bottom = 0
         if self.rect.bottom < 0:
             self.rect.top = HEIGHT
+
+
+class PowerUp(pg.sprite.Sprite):
+
+    def __init__(self, size, lifetime, image_name):
+        pg.sprite.Sprite.__init__(self)
+        self.image = pg.transform.smoothscale(
+            pg.image.load((assets_folder / image_name).as_posix()).convert(), size
+        )
+        self.image.set_colorkey((0, 0, 0))
+        self.rect = self.image.get_rect()
+        self.lifetime = lifetime
+        self.effect = ""
+
+    def update(self, *args):
+        if self.lifetime < 0:
+            self.kill()
+        else:
+            self.lifetime -= 1
+
+
+class HealthUp(PowerUp):
+
+    def __init__(self, size=(30,30), lifetime=10):
+        super().__init__(size, lifetime, "heart.png")
+        self.effect = "HealthUp"
+        self.rect.center = (300, 300)
+
 
 
 class HealthBar:

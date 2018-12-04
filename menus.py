@@ -68,6 +68,7 @@ class ButtonSprite(pygame.sprite.Sprite):
         self.name = name
         # Image array, stores all potential appearances of the button
         self.images = []
+        self.image_counter = 0
         # A value from 0 to 1, determines the x coordinate relative to the screen
         self.rel_x = rel_x
         self.rel_y = rel_y

@@ -2,6 +2,7 @@ import pygame as pg
 from pathlib import Path
 import random
 import math
+import algorithms
 
 WIDTH, HEIGHT = 1280, 720
 
@@ -61,23 +62,22 @@ class Game:
 
     def check_player_collision(self):
         player = self.player.sprites()[0]
-
-        if player.invunticks > 0:
-            return
-
         collided_asteroids = pg.sprite.groupcollide(self.player, self.asteroid_sprites, False, False,
                                                     collided=pg.sprite.collide_circle)
 
         for key, value in collided_asteroids.items():
-            player = key
-            asteroids = value
-            for asteroid in asteroids:
-                while not asteroid.get_hit():
-                    pass
-                self.asteroid_sprites.add(asteroid.split())
+            # I used a KMAP to solve this, no joke!
+            if (not (player.invunticks > 0)) or player.impervious:
+                player = key
+                asteroids = value
+                for asteroid in asteroids:
+                    while not asteroid.get_hit():
+                        pass
+                    self.asteroid_sprites.add(asteroid.split())
 
-            player.health -= 1
-            player.invunticks = 180
+            if not (player.invunticks > 0):
+                player.health -= 1
+                player.invunticks = 180
 
     def check_power_up_collisions(self):
         collided_powerups = pg.sprite.groupcollide(self.power_up_sprites, self.player, True, False,
@@ -87,6 +87,17 @@ class Game:
             for power_up in value:
                 if power_up.effect == "HealthUp":
                     self.player_sprite.health += 1
+                elif power_up.effect == "Impervious":
+                    self.player_sprite.impervious = 1
+                    self.player_sprite.invunticks = 300
+                elif power_up.effect == "Score":
+                    self.score += 10
+                elif power_up.effect == "Circle":
+                    # Summon a circle of missiles around the player.
+                    missile_locations = algorithms.circle(self.player_sprite.rect.x, self.player_sprite.rect.y, 30)
+                    missile_velocities = algorithms.circle(0, 0, 30)
+
+                    new_missiles = []
 
     def spawn_missiles(self):
         keys = pg.key.get_pressed()
@@ -145,8 +156,11 @@ class Player(pg.sprite.Sprite):
         # TEMPORARY HEALTH CHANGE
         self.health = 5
         self.invunticks = 300
+        self.impervious = False
 
         self.fixed_image = pg.image.load((assets_folder / "ship.png").as_posix()).convert()
+        self.impervious_image = pg.image.load((assets_folder/ "ship_invunrable.png").as_posix()).convert()
+        self.impervious_image.set_colorkey((0, 0, 0))
         self.fixed_image.set_colorkey((0, 0, 0))
         self.radius = 10
 
@@ -161,7 +175,10 @@ class Player(pg.sprite.Sprite):
 
     def fix_angles(self):
         old_rect = self.rect
-        self.image = pg.transform.rotate(self.fixed_image, math.degrees(self.angle))
+        if self.impervious:
+            self.image = pg.transform.rotate(self.impervious_image, math.degrees(self.angle))
+        else:
+            self.image = pg.transform.rotate(self.fixed_image, math.degrees(self.angle))
         self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.center = old_rect.center
@@ -174,8 +191,10 @@ class Player(pg.sprite.Sprite):
         self.fix_angles()
 
         if self.invunticks > 0:
-            if self.invunticks & 16:
+            if (not self.impervious) & (self.invunticks & 16):
                 self.make_blank()
+        else:
+            self.impervious = False
 
         self.rect.x += self.vx
         self.rect.y += self.vy
@@ -281,14 +300,14 @@ class Asteroid(pg.sprite.Sprite):
 
 
 class PowerUp(pg.sprite.Sprite):
-
-    def __init__(self, size, lifetime, image_name):
+    def __init__(self, size, lifetime, image_name, location):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.transform.smoothscale(
             pg.image.load((assets_folder / image_name).as_posix()).convert(), size
         )
         self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect()
+        self.rect.center = location
         self.lifetime = lifetime
         self.effect = ""
 
@@ -300,15 +319,30 @@ class PowerUp(pg.sprite.Sprite):
 
 
 class HealthUp(PowerUp):
-
-    def __init__(self, size=(30,30), lifetime=10):
-        super().__init__(size, lifetime, "heart.png")
+    def __init__(self, location):
+        super().__init__((46, 30), 600, "health.png", location)
         self.effect = "HealthUp"
-        self.rect.center = (300, 300)
+
+
+class CircleMissiles(PowerUp):
+    def __init__(self, location):
+        super().__init__((46, 30), 600, "health.png", location)
+        self.effect = "Circle"
+
+
+class SpanningDestruction(PowerUp):
+    def __init__(self, location):
+        super().__init__((46, 30), 600, "health.png", location)
+        self.effect = "Span"
+
+
+class Impervious(PowerUp):
+    def __init__(self, location):
+        super().__init__((46, 30), 600, "health.png", location)
+        self.effect = "Impervious"
 
 
 class HealthBar:
-
     def __init__(self, health, size):
         self.fixed_image = pg.transform.smoothscale(
             pg.image.load((assets_folder / "heart.png").as_posix()).convert(), size

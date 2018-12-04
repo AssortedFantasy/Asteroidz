@@ -65,19 +65,24 @@ class Game:
             if self.time_to_next < 0:
                 self.is_running = False
 
+    def roll_for_powerup(self, location):
+        # Fairly generous in this case.
+        if random.randint(1, 6) >= 4:
+            power = random.choice(ALL_POWER_UPS)
+            self.power_up_sprites.add(power(location))
+
     def check_asteroid_missile_collision(self):
         collided_missiles = pg.sprite.groupcollide(self.asteroid_sprites, self.missile_sprites, False, True,
                                                    collided=pg.sprite.collide_circle)
 
-        for asteroid in collided_missiles.keys():
-            if asteroid.get_hit():
-                # One out of 6 spawn a power_up
-                if random.randint(1, 6) >= 4:
-                    power = random.choice(ALL_POWER_UPS)
-                    self.power_up_sprites.add(power(asteroid.rect.center))
-
-                self.asteroid_sprites.add(asteroid.split())
-                self.score += 1
+        for asteroid, missiles in collided_missiles.items():
+            for _ in missiles:
+                if asteroid.get_hit():
+                    # Sometimes asteroids drop powerups!
+                    self.roll_for_powerup(asteroid.rect.center)
+                    self.asteroid_sprites.add(asteroid.split())
+                    self.score += 1
+                    break
 
     def check_player_collision(self):
         player = self.player_sprite
@@ -92,6 +97,10 @@ class Game:
                 for asteroid in asteroids:
                     while not asteroid.get_hit():
                         pass
+
+                    if player.impervious:  # You only get points if the player is impervious.
+                        self.roll_for_powerup(asteroid.rect.center)
+                        self.score += 1
                     self.asteroid_sprites.add(asteroid.split())
 
             if not (player.invunticks > 0):

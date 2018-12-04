@@ -26,8 +26,8 @@ class Game:
 
         self.level_cleared = pg.image.load((assets_folder / "level_cleared.png").as_posix()).convert()
         self.level_cleared.set_colorkey((0, 0, 0))
-        self.level_cleared.get_rect().topleft = WIDTH//2, HEIGHT//2
-        self.level_cleared_anchor = self.level_cleared.get_rect().center
+        lx, ly = self.level_cleared.get_rect().center
+        self.level_cleared_anchor = WIDTH//2 - lx, HEIGHT//2 - ly
 
     def add_random_asteroid(self):
         size = random.choices([5, 6, 7, 8, 9, 10, 11],
@@ -168,7 +168,7 @@ class Game:
             pg.draw.aaline(screen, (255, 0, 0), line.p0, line.p1, line.life//10)
         if not self.asteroid_sprites:
             screen.blit(self.level_cleared, self.level_cleared_anchor)
-            print('mur')
+
 
 # Where the assets should come from
 assets_folder = Path("./assets/")
@@ -376,25 +376,25 @@ class HealthUp(PowerUp):
 
 class CircleMissiles(PowerUp):
     def __init__(self, location):
-        super().__init__((46, 30), 600, "health.png", location)
+        super().__init__((46, 30), 600, "circle_missile.png", location)
         self.effect = "Circle"
 
 
 class SpanningDestruction(PowerUp):
     def __init__(self, location):
-        super().__init__((46, 30), 600, "health.png", location)
+        super().__init__((46, 30), 600, "bolt.png", location)
         self.effect = "Span"
 
 
 class Impervious(PowerUp):
     def __init__(self, location):
-        super().__init__((46, 30), 600, "health.png", location)
+        super().__init__((46, 30), 600, "invuln.png", location)
         self.effect = "Impervious"
 
 
 class ScorePoints(PowerUp):
     def __init__(self, location):
-        super().__init__((46, 30), 600, "health.png", location)
+        super().__init__((46, 30), 600, "score.png", location)
         self.effect = "Score"
 
 

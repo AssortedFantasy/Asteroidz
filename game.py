@@ -78,7 +78,6 @@ while run_game:
         asteroids_display.update_text("Asteroids:  {}".format(len(game.asteroid_sprites.sprites())))
         game.update()
         game.draw(screen)
-        screen.blit(game.health_bar.health_bar, (0, 0))
         screen.blit(score_display.image, (0, 30))
         screen.blit(asteroids_display.image, (0, 55))
 

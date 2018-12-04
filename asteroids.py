@@ -15,6 +15,7 @@ class Game:
         self.asteroid_sprites = pg.sprite.Group()
         self.missile_sprites = pg.sprite.Group()
         self.power_up_sprites = pg.sprite.Group()
+        self.line_sprites = pg.sprite.Group()
         self.player = pg.sprite.GroupSingle()
 
         self.player_sprite = Player(WIDTH // 2, HEIGHT // 2)
@@ -39,24 +40,32 @@ class Game:
     def update(self):
         self.asteroid_sprites.update()
         self.missile_sprites.update()
+        self.line_sprites.update()
+        self.power_up_sprites.update()
         self.player.update()
+
         self.spawn_missiles()
-        self.check_collisions()
+        self.check_asteroid_missile_collision()
         self.check_player_collision()
         self.check_power_up_collisions()
         if self.player_sprite.health < 0:
             self.is_running = False
-        if not self.asteroid_sprites: # If there aren't any asteroids
+        if not self.asteroid_sprites:  # If there aren't any asteroids left.
             self.won = True
             self.is_running = False
 
-    def check_collisions(self):
+    def check_asteroid_missile_collision(self):
         collided_missiles = pg.sprite.groupcollide(self.missile_sprites, self.asteroid_sprites, True, False,
                                                    collided=pg.sprite.collide_circle)
 
         for value in collided_missiles.values():
             for asteroid in value:
                 if asteroid.get_hit():
+                    # One out of 6 spawn a power_up
+                    if random.randint(1, 6) > 5:
+                        power = random.choice(ALL_POWER_UPS)
+                        self.power_up_sprites.add(power(asteroid.rect.center))
+
                     self.asteroid_sprites.add(asteroid.split())
                     self.score += 1
 
@@ -94,10 +103,34 @@ class Game:
                     self.score += 10
                 elif power_up.effect == "Circle":
                     # Summon a circle of missiles around the player.
-                    missile_locations = algorithms.circle(self.player_sprite.rect.x, self.player_sprite.rect.y, 30)
+                    x, y = self.player_sprite.rect.center
+                    missile_locations = algorithms.circle(x, y, 30)
                     missile_velocities = algorithms.circle(0, 0, 30)
 
                     new_missiles = []
+                    for location, velocity in zip(missile_locations, missile_velocities):
+                        x, y = location
+                        vx, vy = velocity  # Only used to compute angles, velocity actually given is 10.
+                        new_missiles.append(Missile(x, y, math.atan2(-vy, vx), 10, 0, 0))
+
+                    self.missile_sprites.add(new_missiles)
+
+                elif power_up.effect == "Span":
+                    # Rather complicated, Create a spanning tree over the map which shoots every asteroid at once.
+                    points_to_hit = []
+                    new_shards = []
+                    for asteroid in self.asteroid_sprites:
+                        points_to_hit.append(asteroid.rect.center)
+                        if asteroid.get_hit():
+                            new_shards.extend(asteroid.split())
+                    self.asteroid_sprites.add(new_shards)
+                    points_to_hit.append(power_up.rect.center)
+
+                    spanning_tree = algorithms.prims_algorithm(points_to_hit)
+                    lines = []
+                    for point in spanning_tree[1:]:
+                        lines.append(Line(point.x, point.y, point.nearest.x, point.nearest.y))
+                    self.line_sprites.add(lines)
 
     def spawn_missiles(self):
         keys = pg.key.get_pressed()
@@ -117,7 +150,11 @@ class Game:
     def draw(self, screen):
         self.asteroid_sprites.draw(screen)
         self.missile_sprites.draw(screen)
+        self.power_up_sprites.draw(screen)
         self.player.draw(screen)
+        screen.blit(self.health_bar.health_bar, (0, 0))
+        for line in self.line_sprites:
+            pg.draw.aaline(screen, (255, 0, 0), line.p0, line.p1, line.life//10)
 
 
 # Where the assets should come from
@@ -342,6 +379,12 @@ class Impervious(PowerUp):
         self.effect = "Impervious"
 
 
+class ScorePoints(PowerUp):
+    def __init__(self, location):
+        super().__init__((46, 30), 600, "health.png", location)
+        self.effect = "Score"
+
+
 class HealthBar:
     def __init__(self, health, size):
         self.fixed_image = pg.transform.smoothscale(
@@ -357,3 +400,19 @@ class HealthBar:
         self.health_bar.fill((0, 0, 0))
         for i in range(health + 1):
             self.health_bar.blit(self.fixed_image, (self.fixed_image.get_rect().size[0] * i, 0))
+
+
+class Line(pg.sprite.Sprite):
+    def __init__(self, x0, y0, x1, y1):
+        pg.sprite.Sprite.__init__(self)
+        self.life = 60
+        self.p0 = x0, y0
+        self.p1 = x1, y1
+
+    def update(self):
+        self.life -= 1
+        if self.life <= 0:
+            self.kill()
+
+# This list is used to create powerups
+ALL_POWER_UPS = [HealthUp, SpanningDestruction, Impervious, ScorePoints, CircleMissiles]

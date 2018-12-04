@@ -307,7 +307,6 @@ class HealthUp(PowerUp):
         self.rect.center = (300, 300)
 
 
-
 class HealthBar:
 
     def __init__(self, health, size):

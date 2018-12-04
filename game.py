@@ -17,7 +17,7 @@ menu = menus.Menu(screen)
 menu.add_button(menus.ButtonSprite('New_Game', 0.5, 0.4, 600, 100, Path("./Assets/").glob("New_game*")))
 menu.add_button(menus.ButtonSprite('Quit', 0.5, 0.6, 300, 90, Path("./Assets/").glob("Quit*")))
 score_screen = menus.Menu(screen, bg_path="./assets/Score_screen.png")
-score_screen.textBoxes.append(menus.Text("231", 0.48, 0.27, 65))
+score_screen.textBoxes.append(menus.Text("0", 0.48, 0.27, 65))
 score_screen.add_button(menus.ButtonSprite('Back', 0.5, 0.5, 250, 80, Path("./Assets/").glob("Back*")))
 
 
@@ -80,6 +80,7 @@ while run_game:
                 game = initialize_game(level)
             else:
                 state = "GAME_OVER"
+                score_screen.textBoxes[0].update_text("{}".format(level))
                 level = 1
                 game = None
 

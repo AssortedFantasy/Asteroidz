@@ -10,6 +10,7 @@ class Game:
     def __init__(self):
         self.is_running = True
         self.won = False
+        self.score = 0
         self.asteroid_sprites = pg.sprite.Group()
         self.missile_sprites = pg.sprite.Group()
         self.player = pg.sprite.GroupSingle()
@@ -28,9 +29,9 @@ class Game:
         vx = random.randint(size - 13, 13 - size)
         vy = random.randint(size - 13, 13 - size)
 
-        angular_velocty = random.random() * 2 - 1
+        angular_velocity = random.random() * 2 - 1
 
-        self.asteroid_sprites.add(Asteroid(size, posx, posy, vx, vy, angular_velocty))
+        self.asteroid_sprites.add(Asteroid(size, posx, posy, vx, vy, angular_velocity))
 
     def update(self):
         self.asteroid_sprites.update()
@@ -50,9 +51,10 @@ class Game:
                                                    collided=pg.sprite.collide_circle)
 
         for value in collided_missiles.values():
-            for astroid in value:
-                if astroid.get_hit():
-                    self.asteroid_sprites.add(astroid.split())
+            for asteroid in value:
+                if asteroid.get_hit():
+                    self.asteroid_sprites.add(asteroid.split())
+                    self.score += 1
 
     def check_player_collision(self):
         player = self.player.sprites()[0]
@@ -83,9 +85,9 @@ class Game:
 
                 posx, posy = player.rect.center
                 angle = player.angle
-                new_missle = Missile(posx - 12 * math.sin(angle), posy - 12 * math.cos(angle), angle, 7,
-                                     player.vx, player.vy)
-                self.missile_sprites.add(new_missle)
+                new_missile = Missile(posx - 12 * math.sin(angle), posy - 12 * math.cos(angle), angle, 4,
+                                      player.vx, player.vy)
+                self.missile_sprites.add(new_missile)
         else:
             self.space_pressed = True
 
@@ -128,7 +130,8 @@ class Player(pg.sprite.Sprite):
     def __init__(self, xpos, ypos):
         pg.sprite.Sprite.__init__(self)
 
-        self.health = 5
+        # TEMPORARY HEALTH CHANGE
+        self.health = 0
         self.invunticks = 300
 
         self.fixed_image = pg.image.load((assets_folder / "ship.png").as_posix()).convert()

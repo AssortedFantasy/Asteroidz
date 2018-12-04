@@ -69,9 +69,11 @@ while run_game:
             pass
     elif state == "GAME":
         if game is None:
-            game = initialize_game(1)
+            game = initialize_game(2)
 
         game.update()
+        # game.health_bar.update_health()
+        # screen.blit(game.health_bar)
         game.draw(screen)
 
         if not game.is_running:
@@ -80,7 +82,7 @@ while run_game:
                 game = initialize_game(level)
             else:
                 state = "GAME_OVER"
-                score_screen.textBoxes[0].update_text("{}".format(level))
+                score_screen.textBoxes[0].update_text("{}".format(game.score))
                 level = 1
                 game = None
 

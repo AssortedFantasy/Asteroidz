@@ -17,6 +17,7 @@ class Game:
 
         self.player_sprite = Player(WIDTH // 2, HEIGHT // 2)
         self.player.add(self.player_sprite)
+        # self.health_bar = HealthBar(self.player.health, (30, 30))
         self.space_pressed = False
 
     def add_random_asteroid(self):
@@ -266,3 +267,21 @@ class Asteroid(pg.sprite.Sprite):
             self.rect.bottom = 0
         if self.rect.bottom < 0:
             self.rect.top = HEIGHT
+
+
+class HealthBar:
+
+    def __init__(self, health, size):
+        self.fixed_image = pg.transform.smoothscale(
+            pg.image.load((assets_folder / "heart.png").as_posix()).convert(), size
+        )
+        self.health = health
+        self.health_bar = pg.Surface((size(0) * health, size(1)))
+        self.health_bar.fill((255, 255, 255))
+        for i in range(health):
+            self.health_bar.blit(self.fixed_image, (size(0) * i, 0))
+
+    def update_health(self):
+        self.health_bar.fill((255, 255, 255))
+        for i in range(self.health):
+            self.health_bar.blit(self.fixed_image, (self.fixed_image.size(0) * i, 0))

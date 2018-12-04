@@ -35,8 +35,6 @@ class Game:
 
         self.asteroid_sprites.add(Asteroid(size, posx, posy, vx, vy, angular_velocity))
 
-        # TEMP TEST CODE
-        self.power_up_sprites.add(HealthUp())
 
     def update(self):
         self.asteroid_sprites.update()

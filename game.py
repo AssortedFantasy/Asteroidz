@@ -73,9 +73,9 @@ while run_game:
             game = initialize_game(1)
 
         game.health_bar.update_health(game.player_sprite.health)
-        screen.blit(game.health_bar.health_bar, (0, 0))
         game.update()
         game.draw(screen)
+        screen.blit(game.health_bar.health_bar, (0, 0))
 
         if not game.is_running:
             if game.won:

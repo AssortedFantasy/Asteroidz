@@ -35,7 +35,6 @@ class Game:
 
         self.asteroid_sprites.add(Asteroid(size, posx, posy, vx, vy, angular_velocity))
 
-
     def update(self):
         self.asteroid_sprites.update()
         self.missile_sprites.update()

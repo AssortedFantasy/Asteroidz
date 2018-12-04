@@ -22,6 +22,7 @@ score_screen.add_button(menus.ButtonSprite('Back', 0.5, 0.5, 250, 80, Path("./As
 
 
 state = "MENU"
+score = 0
 run_game = True
 
 level = 1
@@ -71,17 +72,22 @@ while run_game:
         if game is None:
             game = initialize_game(1)
 
+        game.health_bar.update_health(game.player_sprite.health)
+        screen.blit(game.health_bar.health_bar, (0, 0))
         game.update()
         game.draw(screen)
 
         if not game.is_running:
             if game.won:
                 level += 1
+                score += game.score
                 game = initialize_game(level)
             else:
                 state = "GAME_OVER"
-                score_screen.textBoxes[0].update_text("{}".format(level))
+                score += game.score
+                score_screen.textBoxes[0].update_text("{}".format(score))
                 level = 1
+                score = 0
                 game = None
 
     pg.display.flip()

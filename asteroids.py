@@ -141,6 +141,7 @@ class Game:
                     for asteroid in self.asteroid_sprites:
                         points_to_hit.append(asteroid.rect.center)
                         if asteroid.get_hit():
+                            self.score += 1
                             new_shards.extend(asteroid.split())
                     self.asteroid_sprites.add(new_shards)
                     points_to_hit.append(power_up.rect.center)
@@ -173,7 +174,9 @@ class Game:
         self.player.draw(screen)
         screen.blit(self.health_bar.health_bar, (0, 0))
         for line in self.line_sprites:
-            pg.draw.aaline(screen, (255, 0, 0), line.p0, line.p1, line.life//10)
+            # Flashes, looks fairly lightning esque.
+            if line.life & 16:
+                pg.draw.line(screen, (255, 200, 0), line.p0, line.p1, line.life//10)
         if not self.asteroid_sprites:
             screen.blit(self.level_cleared, self.level_cleared_anchor)
 
@@ -426,7 +429,7 @@ class HealthBar:
 class Line(pg.sprite.Sprite):
     def __init__(self, x0, y0, x1, y1):
         pg.sprite.Sprite.__init__(self)
-        self.life = 60
+        self.life = 64
         self.p0 = x0, y0
         self.p1 = x1, y1
 
@@ -435,5 +438,6 @@ class Line(pg.sprite.Sprite):
         if self.life <= 0:
             self.kill()
 
+#ALL_POWER_UPS = [SpanningDestruction]
 # This list is used to create powerups
 ALL_POWER_UPS = [HealthUp, SpanningDestruction, Impervious, ScorePoints, CircleMissiles]

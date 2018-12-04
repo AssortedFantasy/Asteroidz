@@ -72,9 +72,9 @@ while run_game:
         if game is None:
             game = initialize_game(1)
 
+        game.health_bar.update_health(game.player_sprite.health)
+        screen.blit(game.health_bar.health_bar, (0, 0))
         game.update()
-        # game.health_bar.update_health()
-        # screen.blit(game.health_bar)
         game.draw(screen)
 
         if not game.is_running:

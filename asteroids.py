@@ -10,7 +10,9 @@ WIDTH, HEIGHT = 1280, 720
 class Game:
     def __init__(self):
         self.is_running = True
+        self.is_ended = False
         self.won = False
+        self.time_to_next = 120
         self.score = 0
         self.asteroid_sprites = pg.sprite.Group()
         self.missile_sprites = pg.sprite.Group()
@@ -48,11 +50,16 @@ class Game:
         self.check_asteroid_missile_collision()
         self.check_player_collision()
         self.check_power_up_collisions()
-        if self.player_sprite.health < 0:
-            self.is_running = False
+        if self.player_sprite.health < 0: # If we die.
+            self.is_ended = True
+            self.player_sprite.kill()
         if not self.asteroid_sprites:  # If there aren't any asteroids left.
             self.won = True
-            self.is_running = False
+            self.is_ended = True
+        if self.is_ended:
+            self.time_to_next -= 1
+            if self.time_to_next < 0:
+                self.is_running = False
 
     def check_asteroid_missile_collision(self):
         collided_missiles = pg.sprite.groupcollide(self.missile_sprites, self.asteroid_sprites, True, False,
@@ -62,7 +69,7 @@ class Game:
             for asteroid in value:
                 if asteroid.get_hit():
                     # One out of 6 spawn a power_up
-                    if random.randint(1, 6) > 5:
+                    if random.randint(1, 6) >= 4:
                         power = random.choice(ALL_POWER_UPS)
                         self.power_up_sprites.add(power(asteroid.rect.center))
 
@@ -70,7 +77,7 @@ class Game:
                     self.score += 1
 
     def check_player_collision(self):
-        player = self.player.sprites()[0]
+        player = self.player_sprite
         collided_asteroids = pg.sprite.groupcollide(self.player, self.asteroid_sprites, False, False,
                                                     collided=pg.sprite.collide_circle)
 
@@ -89,7 +96,7 @@ class Game:
                 player.invunticks = 180
 
     def check_power_up_collisions(self):
-        collided_powerups = pg.sprite.groupcollide(self.power_up_sprites, self.player, True, False,
+        collided_powerups = pg.sprite.groupcollide(self.player, self.power_up_sprites, False, True,
                                                    collided=pg.sprite.collide_circle)
 
         for value in collided_powerups.values():

@@ -147,7 +147,7 @@ class Game:
         if not keys[pg.K_SPACE]:
             if self.space_pressed:
                 self.space_pressed = False
-                player = self.player.sprites()[0]
+                player = self.player_sprite
 
                 posx, posy = player.rect.center
                 angle = player.angle

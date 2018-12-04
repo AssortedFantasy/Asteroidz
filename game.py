@@ -10,6 +10,7 @@ speed = 0.1
 # Inititalize pygame and create a window
 pg.init()
 screen = pg.display.set_mode(RES)
+pg.display.set_caption("ASTEROIDZ - CMPUT274 Final Project by Tharidu and Jehanzeb")
 clock = pg.time.Clock()
 game = None
 

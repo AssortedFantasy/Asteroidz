@@ -274,15 +274,15 @@ class Player(pg.sprite.Sprite):
             self.rect.top = HEIGHT
 
         keys = pg.key.get_pressed()
-        if keys[pg.K_w]:  # Accelerate
+        if keys[pg.K_w] or keys[pg.K_UP]:  # Accelerate
             self.vx -= math.sin(self.angle) * 0.3
             self.vy -= math.cos(self.angle) * 0.3
-        if keys[pg.K_s]:  # Decelerate
+        if keys[pg.K_s] or keys[pg.K_DOWN]:  # Decelerate
             self.vx += math.sin(self.angle) * 0.3
             self.vy += math.cos(self.angle) * 0.3
-        if keys[pg.K_a]:
+        if keys[pg.K_a] or keys[pg.K_LEFT]:
             self.angle += 0.1
-        if keys[pg.K_d]:
+        if keys[pg.K_d] or keys[pg.K_RIGHT]:
             self.angle -= 0.1
 
 

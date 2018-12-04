@@ -66,19 +66,18 @@ class Game:
                 self.is_running = False
 
     def check_asteroid_missile_collision(self):
-        collided_missiles = pg.sprite.groupcollide(self.missile_sprites, self.asteroid_sprites, True, False,
+        collided_missiles = pg.sprite.groupcollide(self.asteroid_sprites, self.missile_sprites, False, True,
                                                    collided=pg.sprite.collide_circle)
 
-        for value in collided_missiles.values():
-            for asteroid in value:
-                if asteroid.get_hit():
-                    # One out of 6 spawn a power_up
-                    if random.randint(1, 6) >= 4:
-                        power = random.choice(ALL_POWER_UPS)
-                        self.power_up_sprites.add(power(asteroid.rect.center))
+        for asteroid in collided_missiles.keys():
+            if asteroid.get_hit():
+                # One out of 6 spawn a power_up
+                if random.randint(1, 6) >= 4:
+                    power = random.choice(ALL_POWER_UPS)
+                    self.power_up_sprites.add(power(asteroid.rect.center))
 
-                    self.asteroid_sprites.add(asteroid.split())
-                    self.score += 1
+                self.asteroid_sprites.add(asteroid.split())
+                self.score += 1
 
     def check_player_collision(self):
         player = self.player_sprite
@@ -97,7 +96,7 @@ class Game:
 
             if not (player.invunticks > 0):
                 player.health -= 1
-                player.invunticks = 180
+                player.invunticks = 120
 
     def check_power_up_collisions(self):
         collided_powerups = pg.sprite.groupcollide(self.player, self.power_up_sprites, False, True,
@@ -205,7 +204,7 @@ class Player(pg.sprite.Sprite):
 
         # TEMPORARY HEALTH CHANGE
         self.health = 5
-        self.invunticks = 300
+        self.invunticks = 210
         self.impervious = False
 
         self.fixed_image = pg.image.load((assets_folder / "ship.png").as_posix()).convert()
@@ -241,7 +240,7 @@ class Player(pg.sprite.Sprite):
         self.fix_angles()
 
         if self.invunticks > 0:
-            if (not self.impervious) & (self.invunticks & 16):
+            if (not self.impervious) and (self.invunticks & 16):
                 self.make_blank()
         else:
             self.impervious = False

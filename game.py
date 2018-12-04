@@ -21,6 +21,7 @@ score_screen.textBoxes.append(menus.Text("0", 0.48, 0.27, 65))
 score_screen.add_button(menus.ButtonSprite('Back', 0.5, 0.5, 250, 80, Path("./Assets/").glob("Back*")))
 score_display = menus.Text("", 0, 0.2, 20)
 asteroids_display = menus.Text("", 0, 0.3, 20)
+level_display = menus.Text("Level: 1", 0, 0.3, 20)
 fps_display = menus.Text("", 0.935, 0, 20)
 
 state = "MENU"
@@ -80,8 +81,9 @@ while run_game:
         fps_display.update_text(f"FPS: {clock.get_fps():2.1f}")
         game.update()
         game.draw(screen)
-        screen.blit(score_display.image, (0, 30))
-        screen.blit(asteroids_display.image, (0, 55))
+        screen.blit(score_display.image, (0, 55))
+        screen.blit(asteroids_display.image, (0, 80))
+        screen.blit(level_display.image, (0, 30))
         screen.blit(fps_display.image, (WIDTH * fps_display.rel_x, HEIGHT * fps_display.rel_y))
         if not game.is_running:
             if game.won:
@@ -95,6 +97,7 @@ while run_game:
                 level = 1
                 score = 0
                 game = None
+            level_display.update_text(f"Level: {level}")
 
     pg.display.flip()
     clock.tick(fps)

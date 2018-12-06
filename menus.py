@@ -97,7 +97,9 @@ class Text:
         pygame.font.init()
         self.font = pygame.font.SysFont("impact", size)
         self.image = self.font.render(self.text, True, text_colour, bg_colour)
+        self.image.set_colorkey((0, 0, 0))
 
     def update_text(self, text, text_colour=(255, 255, 255), bg_colour=(0, 0, 0)):
         self.text = " " + text + " "
         self.image = self.font.render(self.text, True, text_colour, bg_colour)
+        self.image.set_colorkey((0, 0, 0))

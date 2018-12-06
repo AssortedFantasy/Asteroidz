@@ -3,17 +3,19 @@ from pathlib import Path
 import asteroids
 import menus
 
+
+# Global Parameters
+# Note you need to update WIDTH/HEIGHT in asteroids as well! (Although its not really used very much)
 WIDTH, HEIGHT = RES = (1280, 720)
 fps = 60
-speed = 0.1
 
-# Inititalize pygame and create a window
+# Inititalize Pygame and create a Display
 pg.init()
 screen = pg.display.set_mode(RES)
 pg.display.set_caption("ASTEROIDZ - CMPUT274 Final Project by Tharidu and Jehanzeb")
 clock = pg.time.Clock()
-game = None
 
+# Menu buttons and Setup
 menu = menus.Menu(screen)
 menu.add_button(menus.ButtonSprite('New_Game', 0.5, 0.4, 600, 100, Path("./Assets/").glob("New_game*")))
 menu.add_button(menus.ButtonSprite('Quit', 0.5, 0.6, 300, 90, Path("./Assets/").glob("Quit*")))
@@ -25,13 +27,16 @@ asteroids_display = menus.Text("", 0, 0.3, 20)
 level_display = menus.Text("Level: 1", 0, 0.3, 20)
 fps_display = menus.Text("", 0.935, 0, 20)
 
+# The Main loop is setup as a finite state machine, these are some of the variables it uses
+game = None
 state = "MENU"
 score = 0
-run_game = True
-
 level = 1
+run_game = True
+mouse_clicked = False
 
 
+# This function creates a new game and initializes it with a bunch of Asteroids
 def initialize_game(i):
     new_game = asteroids.Game()
     for _ in range(i):
@@ -39,19 +44,19 @@ def initialize_game(i):
     return new_game
 
 
+# Main Game loop
 while run_game:
-    mouse_up = False
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run_game = False
-        if event.type == pg.MOUSEBUTTONUP:
-            mouse_up = True
+        elif event.type == pg.MOUSEBUTTONUP:
+            mouse_clicked = True  # Only where you un press the mouse matters.
 
     screen.fill((0, 0, 0))
 
     if state == "MENU":
         menu.is_mouse_over()
-        if mouse_up:
+        if mouse_clicked:
             button_state = menu.is_clicked(pg.mouse.get_pos())
         else:
             button_state = None
@@ -59,11 +64,10 @@ while run_game:
             state = "GAME"
             screen.fill((0, 0, 0))
         elif button_state == "Quit":
-            pg.event.post(pg.event.Event(pg.QUIT, {}))
-        pass
+            run_game = False
     elif state == "GAME_OVER":
         score_screen.is_mouse_over()
-        if mouse_up:
+        if mouse_clicked:
             button_state = score_screen.is_clicked(pg.mouse.get_pos())
             print(button_state)
         else:
@@ -73,8 +77,9 @@ while run_game:
             menu.update()
             pass
     elif state == "GAME":
+        # When this loop is first called, there is no game at all, this is how it is started.
         if game is None:
-            game = initialize_game(1)
+            game = initialize_game(level)
 
         game.health_bar.update_health(game.player_sprite.health)
         score_display.update_text("Score:  {}".format(score + game.score))

@@ -148,46 +148,45 @@ class Point:
             self.distance = new_distance
             self.nearest = other
 
-    # implementing rich comparisions to make sorting work.
-    def __eq__(self, other):
-        return self.distance == other.distance
-
-    def __lt__(self, other):
-        return self.distance < other.distance
-
-    def __le__(self, other):
-        return self.distance <= other.distance
-
-    def __gt__(self, other):
-        return self.distance > other.distance
-
-    def __ge__(self, other):
-        return self.distance >= other.distance
-
 
 def prims_algorithm(euclidian_points):
-    # Computes the minimum spanning tree using a greedy algorithm!
+    # Computes the minimum spanning tree using a greedy algorithm! Runs in O(n^2) time. ( And O(n) space )
+    # There are faster algorithm's in theory, but because the number of points is fairly small,
+    # the asymptotic complexity is less relevant.
+
+    # Technically this can be done in O(n*log(log(n))) average time.
+    # using Borůvka's algorithm and Delaunay triangulation.
+    # which are derived from very complicated math on the plane.
+
     # The last point is always chosen as the first point in the graph.
 
-    # As long as there are points in the list.
-    disjoint_from_tree = [Point(x,y) for x,y in euclidian_points]
-    newest_point = disjoint_from_tree.pop()
+    # Edge case of nothing being passed.
+    if not euclidian_points:
+        return []
+
+    disjoint = [Point(x, y) for x, y in euclidian_points]
+    newest_point = disjoint.pop()
     minimum_spanning = [newest_point]
 
-    while disjoint_from_tree:
+    while disjoint:
         # First, Update all points with the newest added to the tree
-        for p in disjoint_from_tree:
-            p.update_nearest(newest_point)
+        for point in disjoint:
+            point.update_nearest(newest_point)
 
-        # Then sort the list of disjoint points in descending order in terms of
-        # distance from the tree
-        # This is fairly fast since most points don't change so the run lengths are quite long.
-        disjoint_from_tree.sort(reverse=True)
+        # Now find the point with the minimum distance from the tree and connect it to it.
+        closest_point = disjoint[0]
+        closest_index = 0
+        for i, point in enumerate(disjoint[1:], start=1):
+            if point.distance < closest_point.distance:
+                closest_point = point
+                closest_index = i
 
-        # Greedly choose the closest point to the tree, and add it to it.
-        newest_point = disjoint_from_tree.pop()
+        # We do a fancy swap before the pop to make sure this is friendly on memory.
+        # the arrangement of disjoint is irrelevant to the algorithm.
+        disjoint[-1], disjoint[closest_index] = disjoint[closest_index], disjoint[-1]
+
+        newest_point = disjoint.pop()
         minimum_spanning.append(newest_point)
-
     return minimum_spanning
 
 

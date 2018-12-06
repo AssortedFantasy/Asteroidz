@@ -1,4 +1,11 @@
-# This file isn't really mean't to do anything. But it does show off Kruskals theorum.
+# This file isn't really mean't to do anything. But it does show off Prim's Algorithm
+
+# Controls:
+# Spacebar adds a random point
+# P adds 10 random points.
+# Mouseclicks adds a point at the mouse location
+# Q (re)computes the Minimum spanning tree
+# W clears all points.
 
 import pygame as pg
 import algorithms
@@ -13,14 +20,6 @@ running = True
 
 points = []
 lines = []
-
-
-# Controls:
-# Spacebar adds a random point
-# P adds 10 random points.
-# Mouseclicks adds a point at the mouse location
-# Q (re)computes the Minimum spanning tree
-# W clears all points.
 
 while running:
     for event in pg.event.get():

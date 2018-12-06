@@ -42,6 +42,7 @@ level = 1
 #   Arguments:
 #       i: Store the initial number of asteroids
 #   returns: new_game state
+###
 def initialize_game(i):
     new_game = asteroids.Game()
     for _ in range(i):

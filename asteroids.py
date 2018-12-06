@@ -360,7 +360,21 @@ class Asteroid(pg.sprite.Sprite):
             self.rect.top = HEIGHT
 
 
+# Template class for PowerUps
 class PowerUp(pg.sprite.Sprite):
+    ###
+    #
+    # Description: Initializes the PowerUp objects
+    #
+    # Arguments:
+    #   self: The PowerUp object itself
+    #   size: The size tuple the PowerUp will be scaled to on the screen
+    #   lifetime: Integer number of clock ticks the power up will exist for
+    #   image_name: The name of the image for the PowerUp, in the assets folder
+    #   location: The position on the screen of the PowerUp
+    #
+    # Returns: None
+    ###
     def __init__(self, size, lifetime, image_name, location):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.transform.smoothscale(
@@ -370,8 +384,16 @@ class PowerUp(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = location
         self.lifetime = lifetime
+        # Tag used to determine the effect of the PowerUp, intended to be implemented in sub-classes
         self.effect = ""
 
+    ###
+    #   Description: Function to update the PowerUp state every clock tick
+    #
+    #   Arguments: Arbitrary list of arguments determined by sub-classes
+    #
+    #   Returns: None
+    ###
     def update(self, *args):
         if self.lifetime < 0:
             self.kill()

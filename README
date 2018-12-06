@@ -1,0 +1,39 @@
+Name: Jehanzeb Mira
+Student ID: 1593833
+
+Name: Tharidu Witharana
+Student ID: 1534351
+
+Final Project: Asteroidz
+
+Included Files:
+    * README
+    * game.py
+    * asteroids.py
+    * algorithm.py
+    * menus.py
+    * Assets folder
+
+Running Instructions:
+    1. Run the game.py script
+    2. Click the new game button to start the game
+        * The controls are as follows:
+            * Up / W - move ship forward
+            * Down / S - move the ship backwards
+            * Right / D - turn the ship clockwise
+            * Left / A - turn the ship counter-clockwise
+            * Space - Shoot
+    3. Shoot the asteroids to break them and increase your score, getting hit by asteroids will reduce your health
+    4. Power-Ups will often drop when asteroids are destroyed
+        * The power-ups are as follows:
+            * The BitCoin: Increases score by 10
+            * The Juice: Provides temporary invulnerability
+            * The Bolt: Zaps every asteroid on screen
+            * The Missile Barrage: Shoots missiles in a circle around you
+            * The Heart: Increases your health by 1, up to a maximum of 6 health
+     5. One can get to the next level by destroying all asteroids, the game ends when health falls to 0
+
+Notes and Assumptions:
+    - The computer running the game should have an up-to-date version of PyGame
+    - The program should be run in Python 3.7
+    - Background image is a Trapcode MIR default example courtesy of allfinweb

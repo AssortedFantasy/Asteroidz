@@ -20,14 +20,12 @@ class Menu:
         self.buttons = []
         # List to store text objects
         self.textBoxes = []
-        # The display to be written to, can be any pygame surface
         self.screen = screen
         self.width, self.height = screen.get_size()
-        # Sprite Group for all sprites used, buttons are the only object
-        # with sprites in the current implementation
+        # Sprite Group for all sprites used in buttons
         self.menu_sprites = pygame.sprite.Group()
-        # The location of the background image for the menu
-        # Attempts to safely open the path
+        # The path of the background image for this menu
+        # Attempts to safely open either image
         background_location = Path(bg_path)
         try:
             background_file = open(background_location, mode="rb")
@@ -43,7 +41,6 @@ class Menu:
         self.update()
 
     ###
-    #
     # Description: Updates the sprites and text, and draws them to the screen
     #
     # Arguments: None
@@ -126,7 +123,7 @@ class ButtonSprite(pygame.sprite.Sprite):
     #
     # Returns: None
     ###
-    def __init__(self, name, rel_x, rel_y, width, height, button_images):
+    def __init__(self, name, rel_x, rel_y, width, height, button_images, text=""):
         pygame.sprite.Sprite.__init__(self)
         # Name of the button, intended to be used to identify which button is pressed
         self.name = name
@@ -174,14 +171,12 @@ class Text:
     #   font: The font to be rendered, default is impact
     # Returns: None
     ###
-    def __init__(self, text, rel_x, rel_y, size, text_colour=(255, 255, 255), bg_colour=(0, 0, 0), font="impact"):
-        # Pads out the text with some spaces so that it will look cleaner
+    def __init__(self, text, rel_x, rel_y, size, text_colour=(255, 255, 255), bg_colour=(0, 0, 0)):
         self.text = " " + text + " "
         self.rel_x = rel_x
         self.rel_y = rel_y
-        # Initializes fonts rendering, required by pygame
         pygame.font.init()
-        self.font = pygame.font.SysFont(font, size)
+        self.font = pygame.font.SysFont("impact", size)
         self.image = self.font.render(self.text, True, text_colour, bg_colour)
         self.image.set_colorkey((0, 0, 0))
 
@@ -196,7 +191,6 @@ class Text:
     #       text_colour: A three value tupple that defines the RGB value of the background of the text, assumed black
     ###
     def update_text(self, text, text_colour=(255, 255, 255), bg_colour=(0, 0, 0)):
-        # Pads out the text for better rendering
         self.text = " " + text + " "
         self.image = self.font.render(self.text, True, text_colour, bg_colour)
         self.image.set_colorkey((0, 0, 0))

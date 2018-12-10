@@ -6,34 +6,66 @@ Student ID: 1534351
 
 Final Project: Asteroidz
 
+Description:
+    Asteroidz is a clone of the classic arcade game asteroidz recreated in
+    Pygame. The game has additional gameplay mechanics added in the form
+    of powerups which makes the gameplay much more fun and enjoyable, albeit a
+    bit overpowered.
+
 Included Files:
     * README
     * game.py
     * asteroids.py
-    * algorithm.py
+    * algorithms.py
     * menus.py
+    * testing_minimum_spanning_trees.py
     * Assets folder
 
 Running Instructions:
-    1. Run the game.py script
-    2. Click the new game button to start the game
+    1. Run the game.py script with "python3 game.py"
+    2. For fun with Prim's algorithm run testing_minimum_spanning_trees.py
+        * Details in "Notes"
+
+Gameplay instructions:
+    1. Click the new game button on the menu to start a new game
         * The controls are as follows:
-            * Up / W - move ship forward
-            * Down / S - move the ship backwards
-            * Right / D - turn the ship clockwise
-            * Left / A - turn the ship counter-clockwise
+            * Up / W - Accelerate forwards
+            * Down / S - Accelerate backwards
+            * Right / D - Rotate clockwise
+            * Left / A - Rotate counter-clockwise
             * Space - Shoot
+
     3. Shoot the asteroids to break them and increase your score, getting hit by asteroids will reduce your health
-    4. Power-Ups will often drop when asteroids are destroyed
+            * When you get hit or a new game starts you are given temporary invulnerability
+              for a few seconds. When your flashing you cannot collide with Asteroids.
+
+    4. Power-Ups will often drop when asteroids are destroyed (except when you collide into them)
         * The power-ups are as follows:
             * The BitCoin: Increases score by 10
-            * The Juice: Provides temporary invulnerability
+            * The Juice: Makes you temporarily impervious
+                - You do not take any damage from getting hit by asteroids
+                - But they will break on impact and drop powerups when they do so.
             * The Bolt: Zaps every asteroid on screen
+                - Deals only one damage to every asteroid, larger asteroids have more than one health.
+                - Destroys asteroids and does not drop powerups
             * The Missile Barrage: Shoots missiles in a circle around you
             * The Heart: Increases your health by 1, up to a maximum of 6 health
+
      5. One can get to the next level by destroying all asteroids, the game ends when health falls to 0
 
-Notes and Assumptions:
-    - The computer running the game should have an up-to-date version of PyGame
-    - The program should be run in Python 3.7
+Notes, Assumptions and Dependencies:
+    - At minimum you require PyGame installed and need to use Python 3.6
+    - Its recommended that you use Python 3.7 and use the latest version of PyGame
+
+    - The game is surprisingly fun to play! Please go ahead and try it
     - Background image is a Trapcode MIR default example courtesy of allfinweb
+
+    - On "testing_minimum_spanning_trees.py"
+        * Testing_minimum_spanning_teees.py is a small utility file which allows you to
+        play with minimum spanning trees. Same dependency on PyGame as the main game.
+        * The full list of controls are:
+            - Click anywhere to add a point
+            - Use spacebar to add a random point
+            - Use P to add 10 random points
+            - Q computes and displays the spanning tree for the points shown. (It doesn't live update)
+            - W will clear all the points (but not remove the spanning tree, use Q on a clear board)

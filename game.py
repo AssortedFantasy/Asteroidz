@@ -81,7 +81,6 @@ while run_game:
         score_screen.is_mouse_over()
         if mouse_clicked:
             button_state = score_screen.is_clicked(pg.mouse.get_pos())
-            print(button_state)
         else:
             button_state = None
         if button_state == "Back":

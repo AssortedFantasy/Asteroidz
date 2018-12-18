@@ -21,7 +21,7 @@ our final project which we built for our CMPUT 274 University course at the univ
 of Alberta. The project rubric is also why its organized so strangely with the other
 README file.
 
-## Example Footage
+## Footage
 
 Heres around 2 minutes of gameplay footage to whet your appetite
 
